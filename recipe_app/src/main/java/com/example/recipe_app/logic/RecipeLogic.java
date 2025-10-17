@@ -2,6 +2,7 @@ package com.example.recipe_app.logic;
 
 import java.util.List;
 
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,10 +57,18 @@ public class RecipeLogic {
 	 * @param id プライマリキー
 	 * @return 結果
 	 */
-	public RecipeDto selectOne(Long id) {
+	public RecipeDto selectOne(Long id)  {
+
+		if (null != id) {
+			return null;
+		}
+
 		RecipeDto recipeDto = new RecipeDto();
 		recipeDto.setId(id);
-		return mapper.selectOne(recipeDto);
+
+		RecipeDto result = mapper.selectOne(recipeDto);
+		result.setIngredientList(getIngredientList(result.getId()));
+        return result;
 
 	}
 
@@ -78,32 +87,44 @@ public class RecipeLogic {
 	/**
 	 * プライマリキーを指定しデータを更新します。
 	 * 
+	 * @param id プライマリキー
 	 * @param dto 更新情報
 	 * @return 件数
 	 */
-	public int update(RecipeDto dto) {
+	public int update(Long id, RecipeDto dto) {
 
-		if (isExistRecipe(dto)) {
+		RecipeDto cond = new RecipeDto();
+		cond.setId(id);
+
+		if (!hasRecipe(cond)) {
 			return 0;
 		}
 
-		return mapper.update(dto);
+		cond.setName(dto.getName());
+		cond.setDescription(dto.getDescription());
+		cond.setDifficulty(dto.getDifficulty());
+		cond.setCookingTime(dto.getCookingTime());
+		cond.setCategoryId(dto.getCategoryId());
+		return mapper.update(cond);
 
 	}
 
 	/**
 	 * プライマリキーを指定しデータを削除します。
 	 *
-	 * @param dto 削除条件
+	 * @param id プライマリキー
 	 * @return 件数
 	 */
-	public int delete(RecipeDto dto) {
+	public int delete(Long id) {
 
-		if (isExistRecipe(dto)) {
+		RecipeDto cond = new RecipeDto();
+		cond.setId(id);
+
+		if (!hasRecipe(cond)) {
 			return 0;
 		}
 
-		return mapper.delete(dto);
+		return mapper.delete(cond);
 
 	}
 
@@ -113,17 +134,9 @@ public class RecipeLogic {
 	 * @param dto 条件
 	 * @return true：存在 false：不在
 	 */
-	private boolean isExistRecipe(RecipeDto dto) {
-
-		if (null == mapper.selectOne(dto)) {
-
-			return false;
-
-		}
-
-		return true;
-
-	}
+	private boolean hasRecipe(RecipeDto dto) {
+        return null != mapper.selectOne(dto);
+    }
 
 	/**
 	 * 材料一覧を取得します。
