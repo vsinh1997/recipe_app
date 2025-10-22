@@ -2,7 +2,9 @@ package com.example.recipe_app.dto;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 public class RecipeDto {
@@ -16,4 +18,5 @@ public class RecipeDto {
 	private String categoryName;
 	
 	private List<IngredientDto> ingredientList;
+
 }

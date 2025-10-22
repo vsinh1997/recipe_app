@@ -14,9 +14,9 @@ public interface IngredientMapper {
 	
 	IngredientDto selectOne(IngredientDto dto);
 	
-	int insert(IngredientDto dto);
+	void insert(IngredientDto dto);
 	
-	int update(IngredientDto dto);
+	void update(IngredientDto dto);
 	
 	int delete(IngredientDto dto);
 	

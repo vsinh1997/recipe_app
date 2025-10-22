@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/recipe")
 @RequiredArgsConstructor
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class RecipeController {
 
     /**
@@ -31,7 +31,7 @@ public class RecipeController {
      */
     @GetMapping("")
     public ResponseEntity<List<RecipeDto>> select(RecipeCondDto cond) {
-        return new ResponseEntity<List<RecipeDto>>(logic.select(cond), HttpStatus.OK);
+        return ResponseEntity.ok(logic.select(cond));
     }
 
     /**
@@ -42,14 +42,8 @@ public class RecipeController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<RecipeDto> selectOne(@PathVariable("id") Long id) {
-
-        RecipeDto result = logic.selectOne(id);
-
-        if (null == result) {
-            return new ResponseEntity<RecipeDto>(HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<RecipeDto>(result, HttpStatus.OK);
+        RecipeDto recipeDto = logic.selectOne(id);
+        return (null == recipeDto) ? ResponseEntity.notFound().build() : ResponseEntity.ok(recipeDto);
     }
 
     /**
@@ -59,8 +53,9 @@ public class RecipeController {
      * @return 追加件数
      */
     @PostMapping("")
-    public ResponseEntity<Integer> insert(@RequestBody RecipeDto dto) {
-        return new ResponseEntity<Integer>(logic.insert(dto), HttpStatus.OK);
+    public ResponseEntity<Void> insert(@RequestBody RecipeDto dto) {
+        int createdCount = logic.insert(dto);
+        return (createdCount > 0) ? ResponseEntity.status(HttpStatus.CREATED).build() : ResponseEntity.badRequest().build();
     }
 
     /**
@@ -71,8 +66,9 @@ public class RecipeController {
      * @return 更新件数
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Integer> update(@PathVariable("id") Long id, @RequestBody RecipeDto dto) {
-        return new ResponseEntity<Integer>(logic.update(id, dto), HttpStatus.OK);
+    public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody RecipeDto dto) {
+        int updateCount = logic.update(id, dto);
+        return (updateCount > 0) ? ResponseEntity.ok().build() : ResponseEntity.noContent().build();
     }
 
     /**
@@ -82,8 +78,10 @@ public class RecipeController {
      * @return 削除件数
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Integer> delete(@PathVariable("id") Long id) {
-        return new ResponseEntity<Integer>(logic.delete(id), HttpStatus.OK);
+    public ResponseEntity<Void>delete(@PathVariable("id") Long id) {
+        int deletedCount = logic.delete(id);
+        return (deletedCount > 0) ? ResponseEntity.ok().build() : ResponseEntity.noContent().build();
+
     }
 
 }
