@@ -86,10 +86,7 @@ public class RecipeLogic {
             return 0;
         }
 
-        int recipeInsertCount = recipeMapper.insert(dto);
-        insertOrUpdateIngredients(dto.getId(), dto.getIngredientList(), true);
-        return recipeInsertCount;
-
+        return recipeMapper.insert(dto);
 
     }
 
@@ -113,9 +110,9 @@ public class RecipeLogic {
         }
 
         dto.setId(id);
-        int updatedRecipeCount = recipeMapper.update(dto);
-//        insertOrUpdateIngredients(dto.getId(), dto.getIngredientList(), false);
-        return updatedRecipeCount;
+
+        return recipeMapper.update(dto);
+
     }
 
     /**
@@ -135,29 +132,11 @@ public class RecipeLogic {
             return 0;
         }
 
-        deleteIngredientsByRecipeId(id);
         RecipeDto recipeDto = new RecipeDto();
         recipeDto.setId(id);
         return recipeMapper.delete(recipeDto);
     }
 
-    /**
-     * 条件を指定し材料情報を削除します。
-     *
-     * @param recipeId レシピ番号
-     */
-    private void deleteIngredientsByRecipeId(Long recipeId) {
-        IngredientCondDto ingredientCondDto = new IngredientCondDto();
-        ingredientCondDto.setRecipeId(recipeId);
-        List<IngredientDto> existsIngredientDtoList = ingredientMapper.select(ingredientCondDto);
-        if (null == existsIngredientDtoList || existsIngredientDtoList.isEmpty()) {
-            return;
-        }
-
-        IngredientDto ingredientDto = new IngredientDto();
-        ingredientDto.setId(existsIngredientDtoList.get(0).getId());
-        ingredientMapper.delete(ingredientDto);
-    }
 
     /**
      * データが存在しないかどうか判定します。
@@ -186,30 +165,5 @@ public class RecipeLogic {
         return ingredientMapper.select(ingredientCondDto);
 
     }
-
-    /**
-     * 材料情報を登録・更新します。
-     *
-     * @param recipeId       レシピ番号
-     * @param ingredientList 材料リスト
-     * @param insertFlg      登録フラグ
-     */
-    private void insertOrUpdateIngredients(Long recipeId, List<IngredientDto> ingredientList, boolean insertFlg) {
-
-        if (null == recipeId || null == ingredientList || ingredientList.isEmpty()) {
-            return;
-        }
-
-        for (IngredientDto ingredientDto : ingredientList) {
-            ingredientDto.setRecipeId(recipeId);
-            if (insertFlg) {
-                ingredientMapper.insert(ingredientDto);
-            } else {
-                ingredientMapper.update(ingredientDto);
-            }
-        }
-
-    }
-
 
 }
