@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.recipe_app.mapper.RecipeMapper">
+
+    <!-- INSERT用項目 -->
+    <sql id="insertColumns">
+        name, description, cooking_time, difficulty, category_id
+    </sql>
+
+    <!-- INSERT用値 -->
+    <sql id="insertValues">
+        <if test="name != null and name != ''">
+            #{name, jdbcType=VARCHAR}
+        </if>
+        <if test="name == null or name == ''">
+            NULL
+        </if>
+        <if test="description != null and description != ''">
+            , #{description, jdbcType=VARCHAR}
+        </if>
+        <if test="description == null or description == ''">
+            , NULL
+        </if>
+        <if test="cookingTime != null and cookingTime != ''">
+            , #{cookingTime, jdbcType=VARCHAR}
+        </if>
+        <if test="cookingTime == null or cookingTime == ''">
+            , NULL
+        </if>
+        <if test="difficulty != null and difficulty != ''">
+            , #{difficulty, jdbcType=VARCHAR}
+        </if>
+        <if test="difficulty == null or difficulty == ''">
+            , NULL
+        </if>
+        <if test="categoryId != null and categoryId != ''">
+            , #{categoryId, jdbcType=BIGINT}
+        </if>
+        <if test="categoryId == null or categoryId == ''">
+            , NULL
+        </if>
+    </sql>
+
+    <!-- UPDATE用値 -->
+    <sql id="updateValues">
+        <if test="name != null and name != ''">
+            name = #{name, jdbcType=VARCHAR},
+        </if>
+        <if test="description != null and description != ''">
+            description = #{description, jdbcType=VARCHAR},
+        </if>
+        <if test="cookingTime != null and cookingTime != ''">
+            cooking_time = #{cookingTime, jdbcType=VARCHAR},
+        </if>
+        <if test="difficulty != null and difficulty != ''">
+            difficulty = #{difficulty, jdbcType=VARCHAR},
+        </if>
+        <if test="categoryId != null">
+            category_id = #{categoryId, jdbcType=BIGINT},
+        </if>
+    </sql>
+
+    <!-- 条件 -->
+    <sql id="conditions">
+        <if test="id != null">
+            AND r.id = #{id, jdbcType=BIGINT}
+        </if>
+        <if test="name != null and name != ''">
+            AND r.name LIKE CONCAT('%', #{name, jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="categoryId != null">
+            AND r.category_id = #{categoryId,jdbcType=BIGINT}
+        </if>
+        <if test="difficulty != null and difficulty != ''">
+            AND r.difficulty = #{difficulty, jdbcType=VARCHAR}
+        </if>
+    </sql>
+
+    <!-- 一覧取得のSQL -->
+    <select id="select" parameterType='com.example.recipe_app.dto.RecipeCondDto'
+            resultType="com.example.recipe_app.dto.RecipeDto">
+        SELECT
+        r.*
+        , c.name AS category_name
+        FROM recipe r
+        LEFT JOIN category c
+        ON c.id = r.category_id
+        <where>
+            <include refid="conditions"/>
+        </where>
+    </select>
+
+    <!-- 1レコードを取得のSQL -->
+    <select id="selectOne" parameterType='com.example.recipe_app.dto.RecipeDto'
+            resultType="com.example.recipe_app.dto.RecipeDto">
+        SELECT r.*
+             , c.name AS category_name
+        FROM recipe r
+                 LEFT JOIN category c ON c.id = r.category_id
+        WHERE r.id = #{id, jdbcType=BIGINT}
+    </select>
+
+    <!-- 1レコードを追加のSQL -->
+    <insert id="insert" parameterType="com.example.recipe_app.dto.RecipeDto">
+        INSERT INTO recipe (
+        <include refid="insertColumns"/>
+        ) VALUES (
+        <include refid="insertValues"/>
+        )
+    </insert>
+
+
+    <!-- 1レコードを更新のSQL -->
+    <update id="update" parameterType="com.example.recipe_app.dto.RecipeDto">
+        UPDATE recipe
+        <set>
+            <include refid="updateValues"/>
+        </set>
+        WHERE
+        id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!-- １レコードを削除のSQL -->
+    <delete id="delete" parameterType="com.example.recipe_app.dto.RecipeDto">
+        DELETE
+        FROM recipe
+        WHERE id = #{id, jdbcType=BIGINT}
+    </delete>
+</mapper>
