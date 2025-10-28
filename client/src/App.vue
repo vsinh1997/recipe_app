@@ -1,9 +1,11 @@
 <script setup>
-    import Recipe from './pages/Recipe.vue'
+import Recipe from './pages/Recipe.vue'
 </script>
 
 <template>
-    <Recipe />
+  <div class="m-3">
+    <Recipe/>
+  </div>
 </template>
 
 <style scoped>

@@ -1,11 +1,11 @@
 <script setup>
-
+defineProps({
+  header_name: {type: String, required: true}
+})
 </script>
 
 <template>
-  $END$
+  <h2 class="text-2xl font-bold">{{ header_name }}</h2>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
